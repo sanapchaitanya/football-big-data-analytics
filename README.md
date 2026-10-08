@@ -47,44 +47,35 @@ The main objectives of the project are:
 - Provide an interactive Streamlit dashboard.
 - Allow users to explore hypothetical changes through what-if
   analysis.
-🏗️ System Architecture
-                         ESPN Football Data
-                                │
-                                ▼
-                       Raw Football Dataset
-                                │
-                                ▼
-                     Data Cleaning & Validation
-                                │
-                                ▼
-                  Processed Football Dataset
-                                │
-                                ▼
-                  Historical Feature Engineering
-                                │
-                  ┌─────────────┴─────────────┐
-                  ▼                           ▼
-         Football Analytics              XGBoost Model
-                  │                           │
-        ┌─────────┼─────────┐                 │
-        ▼         ▼         ▼                 ▼
-      Season    Team       H2H         Match Outcome
-     Analysis  Analysis  Analysis       Probabilities
-        │         │         │                 │
-        └─────────┼─────────┘                 ▼
-                  │                    Predicted Result
-                  │                           │
-                  │                           ▼
-                  │                    Score Estimation
-                  │                           │
-                  └─────────────┬─────────────┘
-                                ▼
-                       Streamlit Dashboard
-                                │
-             ┌──────────────────┼──────────────────┐
-             ▼                  ▼                  ▼
-        Analytics          ML Prediction       What-If
-        Dashboard            Dashboard          Analysis
+## 🏗️ System Architecture
+
+```mermaid
+flowchart TD
+
+    A[ESPN Football Data] --> B[Raw Football Dataset]
+    B --> C[Data Cleaning & Validation]
+    C --> D[Processed Football Dataset]
+    D --> E[Historical Feature Engineering]
+
+    E --> F[Football Analytics]
+    E --> G[XGBoost Model]
+
+    F --> F1[Season Analysis]
+    F --> F2[Team Analysis]
+    F --> F3[Head-to-Head Analysis]
+
+    G --> G1[Match Outcome Probabilities]
+    G1 --> G2[Predicted Result]
+    G2 --> G3[Score Estimation]
+
+    F1 --> H[Streamlit Dashboard]
+    F2 --> H
+    F3 --> H
+    G3 --> H
+
+    H --> H1[Analytics Dashboard]
+    H --> H2[ML Prediction Dashboard]
+    H --> H3[What-If Analysis]
 🧰 Technology Stack
   Component                 Technology
   Programming Language      Python
