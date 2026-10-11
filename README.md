@@ -1,357 +1,298 @@
-# ⚽ Football Big Data Analytics and Match Outcome Prediction
+# Football Big Data Analytics and Match Outcome Prediction
 
-An end-to-end football analytics and match outcome prediction system built using historical ESPN football data, Python, Pandas, XGBoost, Plotly, and Streamlit.
+## Project Overview
 
-The project combines football data processing, statistical analysis, historical feature engineering, machine learning, model evaluation, and interactive prediction into a single dashboard.
+**Football Data Analytics and Match Outcome Prediction** is a Big Data Analytics project that analyses English Premier League match data across multiple seasons. It combines Hadoop-based data processing, statistical analysis, machine learning, and interactive visualisation to understand team performance and predict match outcomes.
 
----
+The project uses **Hadoop HDFS, Hadoop MapReduce, Hadoop Streaming, and YARN** to process football match records and generate team-wise and season-wise statistics. An XGBoost classification model predicts whether a match will result in a Home Win, Draw, or Away Win.
 
-## 📌 Project Overview
+The results are presented through an interactive Streamlit dashboard.
 
-The system analyses historical Premier League football matches and provides insights into:
+## Objectives
 
-- League and season performance
-- Team performance
-- Home and away performance
-- Recent form
-- Head-to-head statistics
-- Match outcome prediction
-- Model probabilities
-- Predicted scoreline
-- Model performance
-- Feature importance
-- What-if analysis
+- Analyse English Premier League match data across multiple seasons.
+- Demonstrate Big Data processing using Hadoop.
+- Calculate team-wise and season-wise performance statistics using MapReduce.
+- Identify trends in wins, draws, losses, goals, and points.
+- Predict football match outcomes using machine learning.
+- Visualise analytical results through an interactive dashboard.
 
-The machine learning component predicts three possible match outcomes:
+## Technology Stack
 
-- 🏠 Home Win
-- 🤝 Draw
-- ✈️ Away Win
+| Technology | Purpose |
+|---|---|
+| Python | Data processing, analytics, and model implementation |
+| ESPN | Source of football match data |
+| Pandas | Data manipulation and preparation |
+| Parquet | Columnar storage of processed match data |
+| Hadoop HDFS | Storage of input data for Hadoop processing |
+| Hadoop MapReduce | Distributed processing and aggregation of match records |
+| Hadoop Streaming | Execution of Python Mapper and Reducer scripts |
+| Hadoop YARN | Management and execution of Hadoop jobs |
+| XGBoost | Three-class match outcome prediction |
+| Scikit-learn | Machine learning utilities and evaluation |
+| Streamlit | Interactive web dashboard |
+| Plotly | Data visualisation |
+| Git and GitHub | Version control and project management |
 
----
-
-## 🏗️ System Architecture
+## System Architecture
 
 ```text
-ESPN Football Data
-        ↓
-Raw Football Dataset
-        ↓
-Data Cleaning & Validation
-        ↓
-Processed Football Dataset
-        ↓
-Historical Feature Engineering
-        ↓
- ┌───────────────────────┐
- │                       │
- ▼                       ▼
-Football Analytics    XGBoost Model
- │                       │
- ├── Season Analysis     ▼
- ├── Team Analysis   Match Probabilities
- └── H2H Analysis        │
-                         ▼
-                  Predicted Result
-                         │
-                         ▼
-                  Score Estimation
-                         │
-                         ▼
-                Streamlit Dashboard
-                  │      │      │
-                  ▼      ▼      ▼
-              Analytics  ML   What-If
+        ESPN Football Match Data
+                  |
+                  v
+       Data Collection and Cleaning
+                  |
+                  v
+        Processed Parquet Dataset
+                  |
+                  v
+       CSV Input for Hadoop Processing
+                  |
+                  v
+              Hadoop HDFS
+                  |
+                  v
+          Hadoop MapReduce
+          /             \
+         v               v
+      Mapper           Reducer
+         \               /
+          v             v
+       Team and Season Statistics
+                  |
+                  v
+          MapReduce Output
+                  |
+                  v
+       Streamlit Analytics Dashboard
 ```
 
----
+The match prediction component uses the prepared historical match features and a trained XGBoost model to generate outcome predictions.
 
-## 🧰 Technology Stack
+## Big Data Implementation
 
-| Component | Technology |
-|---|---|
-| Programming | Python |
-| Data Source | ESPN |
-| Data Processing | Pandas |
-| Data Storage | Parquet |
-| Machine Learning | XGBoost |
-| Evaluation | Scikit-learn |
-| Visualization | Plotly |
-| Dashboard | Streamlit |
-| Development | PyCharm |
-| Version Control | Git / GitHub |
+### 1. Hadoop Distributed File System (HDFS)
 
----
+HDFS stores the football match dataset used as input to the Hadoop processing pipeline. The input CSV is uploaded to HDFS before the MapReduce job is executed.
 
-## 📊 Data
+### 2. Hadoop MapReduce
 
-The project uses football match data obtained from ESPN.
+MapReduce is used to aggregate match records and generate team-season statistics.
 
-The dataset contains multiple Premier League seasons and includes information such as:
+**Mapper (`mapper.py`)**
 
-- Match date
-- Home team
-- Away team
-- Match result
-- Season
-- Historical team performance
-- Home/away performance
-- Recent form
-- Head-to-head information
+The Mapper processes individual match records and emits intermediate key-value pairs for the relevant season and team, along with the corresponding match statistics.
 
-The data is cleaned, validated, and stored in Parquet format for efficient processing.
+**Reducer (`reducer.py`)**
 
----
+The Reducer aggregates the intermediate values to calculate:
 
-## 🧠 Feature Engineering
-
-Pre-match features are created using historical information available **before the match begins**.
-
-Features include:
-
-- Points per game
-- Goals scored per game
-- Goals conceded per game
-- Goal difference
-- Recent form
-- Home performance
-- Away performance
-- Head-to-head statistics
 - Matches played
-- Season match number
-- Historical performance across seasons
+- Wins
+- Draws
+- Losses
+- Goals scored
+- Goals conceded
+- Total points
 
-The feature engineering process preserves chronological ordering to reduce the risk of data leakage.
+### 3. Hadoop Streaming
 
----
+Hadoop Streaming allows the Python Mapper and Reducer scripts to execute as a Hadoop MapReduce job without requiring the processing logic to be written in Java.
 
-## 🤖 Machine Learning
+### 4. Hadoop YARN
 
-The project uses **XGBoost as the single machine learning model**.
+YARN manages the execution of the MapReduce application and its processing tasks.
 
-### Prediction Classes
+### 5. MapReduce Output
 
-| Class | Outcome |
-|---|---|
-| 0 | Home Win |
-| 1 | Draw |
-| 2 | Away Win |
+The aggregated results are saved in a tab-separated output file:
 
-The model produces probabilities for all three outcomes.
+`reports/team_season_stats.tsv`
+
+The output is used by the Hadoop Team Analytics page in the Streamlit dashboard.
+
+## Machine Learning
+
+### XGBoost Classification
+
+The project uses **XGBoost Classifier** to predict football match outcomes.
+
+The model classifies a match into one of three categories:
+
+1. Home Win
+2. Draw
+3. Away Win
+
+The model uses historical match features to estimate the probabilities of the possible outcomes.
+
+The machine learning component is separate from the Hadoop MapReduce analytics component. Hadoop processes and aggregates the data, while XGBoost performs the match outcome prediction.
 
 ### Model Evaluation
 
-The model is evaluated using:
+The previously recorded model evaluation results are:
 
-- Accuracy
-- Precision
-- Recall
-- F1 Score
-- ROC-AUC
-- Log Loss
-- Confusion Matrix
-- Feature Importance
+| Metric | Recorded Result |
+|---|---:|
+| Accuracy | 46.9% |
+| Macro F1-score | 36.7% |
+| ROC-AUC | 0.686 |
+| Log Loss | 1.016 |
 
-The dataset is divided chronologically into training, validation, and testing periods.
+These figures represent the recorded evaluation of the existing model and should be interpreted in the context of its test dataset.
 
----
+## Dashboard Features
 
-## ⚽ Match Prediction
+The Streamlit dashboard provides analytical views of football matches and team performance.
 
-The prediction dashboard allows users to select an exact fixture and view:
+### Football Analytics
+- Overview of the available match dataset
+- Season-level performance analysis
+- Team-level statistics
+- Team comparison
+- Interactive charts and visualisations
 
-- Home team
-- Away team
-- Match date
-- Predicted outcome
-- Home win probability
-- Draw probability
-- Away win probability
-- Predicted scoreline
-- Important pre-match features
+### Match Prediction
+- Select home and away teams
+- Generate predictions for Home Win, Draw, and Away Win
+- Display the model's predicted outcome probabilities
 
-The scoreline is estimated using a statistical Poisson-based calculation from pre-match team performance rates.
+### Model Performance
+- View recorded machine learning evaluation metrics
+- Understand the performance of the match outcome classifier
 
----
+### Hadoop Team Analytics
+- View MapReduce-generated team-season statistics
+- Examine matches played, wins, draws, and losses
+- Compare goals scored and conceded
+- Analyse team points using interactive charts
 
-## 🔬 What-If Analysis
+## Dataset and Processing
 
-The What-If module allows users to modify selected pre-match performance features and observe how the XGBoost prediction changes.
+The project uses historical and scheduled English Premier League match records collected from ESPN.
 
-Users can experiment with factors such as:
+The processed dataset is stored in Parquet format. A CSV representation is prepared for Hadoop Streaming, and the resulting MapReduce statistics are saved separately for dashboard visualisation.
 
-- Points per game
-- Recent form
-- Goal difference
+The current Hadoop workflow uses **batch processing**. New match data is not automatically collected or processed in real time; the dataset and MapReduce output must be refreshed by running the relevant processing steps.
 
-The model is **not retrained** during what-if analysis. The existing trained XGBoost model is used to evaluate the hypothetical scenario.
-
----
-
-## 📈 Football Analytics Dashboard
-
-The Streamlit dashboard provides interactive analytics including:
-
-### Overview
-- Dataset summary
-- League statistics
-- Outcome distribution
-- Season trends
-- League table
-
-### Season Analytics
-- Season performance
-- Goals
-- Results
-- Team statistics
-
-### Team Analytics
-- Team performance
-- Recent form
-- Home/away records
-- Goals and points
-
-### Team Comparison
-- Compare two teams
-- Performance statistics
-- Historical comparison
-
-### Machine Learning
-- Match prediction
-- Model performance
-- Feature importance
-- What-if analysis
-
----
-
-## 📂 Project Structure
+## Project Structure
 
 ```text
-sports_calendar/
+football-big-data-analytics/
 │
 ├── app.py
 │
 ├── pages/
-│   ├── overview.py
-│   ├── season_analytics.py
-│   ├── team_analytics.py
-│   ├── team_comparison.py
 │   ├── match_prediction.py
-│   ├── model_performance.py
-│   └── what_if.py
-│
-├── src/
-│   ├── analytics/
-│   │   └── football_analytics.py
-│   │
-│   ├── features/
-│   │   └── football_features.py
-│   │
-│   ├── espn_client.py
-│   ├── espn_premier_league.py
-│   └── train_xgboost_model.py
+│   └── 8_Hadoop_Team_Analytics.py
 │
 ├── data/
 │   ├── raw/
-│   ├── processed/
-│   └── features/
+│   └── processed/
+│       └── football_matches_mapreduce.csv
+│
+├── src/
+│   ├── hadoop_mapreduce/
+│   │   ├── mapper.py
+│   │   └── reducer.py
+│   └──
 │
 ├── models/
-│   ├── xgboost_match_outcome_model.json
-│   ├── feature_columns.json
-│   └── target_mapping.json
 │
 ├── reports/
-│   ├── xgboost_metrics.json
-│   ├── xgboost_test_predictions.csv
-│   └── xgboost_feature_importance.csv
+│   └── team_season_stats.tsv
 │
 ├── README.md
 └── .gitignore
 ```
 
----
+Other existing project files, including model artefacts, data preparation scripts, and reports, may also be present in their respective directories.
 
-## 🚀 Running the Project
+## Installation and Setup
 
-Clone the repository:
+### Prerequisites
+
+- Python
+- Git
+- Hadoop 3.x
+- Java compatible with the installed Hadoop version
+- A Python virtual environment
+
+### 1. Clone the repository
 
 ```bash
 git clone https://github.com/sanapchaitanya/football-big-data-analytics.git
-```
-
-Navigate to the project:
-
-```bash
 cd football-big-data-analytics
 ```
 
-Install the required packages:
+### 2. Create and activate a virtual environment
 
-```bash
-pip install -r requirements.txt
+On Windows PowerShell:
+
+```powershell
+python -m venv .venv
+.\.venv\Scripts\Activate.ps1
 ```
 
-Run the Streamlit dashboard:
+### 3. Install Python dependencies
+
+Install the packages required by the project:
+
+```powershell
+python -m pip install streamlit pandas pyarrow xgboost scikit-learn plotly numpy scipy
+```
+
+### 4. Configure Hadoop
+
+Configure Java and Hadoop, including HDFS and YARN, according to the Hadoop installation environment.
+
+Verify the installation:
 
 ```bash
-streamlit run app.py
+hadoop version
+```
+
+### 5. Run the dashboard
+
+From the project root, run:
+
+```powershell
+python -m streamlit run app.py
 ```
 
 The dashboard will open in your browser.
 
----
+## Running the Hadoop MapReduce Job
 
-## 🔄 Project Workflow
+The MapReduce job is executed separately from the Streamlit dashboard.
+
+1. Ensure Hadoop HDFS and YARN are running.
+2. Upload the prepared CSV dataset to HDFS.
+3. Execute the Hadoop Streaming job using `mapper.py` and `reducer.py`.
+4. Save the output to an HDFS output directory.
+5. Retrieve the generated output and save it as `reports/team_season_stats.tsv`.
+6. Open the Hadoop Team Analytics page to explore the generated statistics.
+
+The Hadoop Streaming JAR path depends on the installed Hadoop version. For Hadoop 3.4.3, the JAR used during development was:
 
 ```text
-ESPN Data
-   ↓
-Cleaning & Validation
-   ↓
-Feature Engineering
-   ↓
-Football Analytics
-   ↓
-XGBoost Training
-   ↓
-Model Evaluation
-   ↓
-Match Prediction
-   ↓
-Streamlit Dashboard
+/opt/hadoop/share/hadoop/tools/lib/hadoop-streaming-3.4.3.jar
 ```
 
----
+## Limitations
 
-## ⚠️ Limitations
+- The data pipeline currently operates in batch mode rather than automatically updating in real time.
+- The accuracy of analytics depends on the completeness and correctness of the collected match data.
+- Match outcome prediction is probabilistic; actual match results may differ from predictions.
+- Hadoop is configured as a single-node, pseudo-distributed environment for development and demonstration rather than a production multi-node cluster.
+- The recorded machine learning evaluation results may vary when the model or dataset is updated.
 
-- Football match outcomes are inherently difficult to predict.
-- The model only uses information available before the match.
-- The latest season may contain fewer completed matches than previous seasons.
-- Predicted scorelines are statistical estimates and should not be interpreted as guaranteed results.
-- Model performance may change as additional seasons and matches become available.
+## Conclusion
 
----
+This project demonstrates the application of Big Data technologies and machine learning to football analytics. Hadoop HDFS provides data storage, MapReduce performs team and season aggregation, Hadoop Streaming enables Python-based processing, and YARN manages job execution. XGBoost provides match outcome predictions, while Streamlit and Plotly make the analytical results accessible through an interactive dashboard.
 
-## 🔮 Future Improvements
+The project demonstrates a practical batch-processing workflow that combines Big Data processing, machine learning, and visual analytics in a single application.
 
-Possible future extensions include:
+## Author
 
-- Additional football leagues
-- More advanced player-level features
-- Live match integration
-- Automated model retraining
-- Additional historical seasons
-- More advanced feature engineering
-- Deployment as a public web application
-
----
-
-## 👩‍💻 Author
-
-**CHaitanya Sanap**
-
-Football Big Data Analytics and Match Outcome Prediction System
-
-**Technologies:** Python · Pandas · XGBoost · Plotly · Streamlit · ESPN · GitHub
+**GitHub Repository:** https://github.com/sanapchaitanya/football-big-data-analytics
