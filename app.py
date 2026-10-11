@@ -46,10 +46,10 @@ model = st.Page(
     icon=":material/analytics:",
 )
 
-what_if = st.Page(
-    "pages/what_if.py",
-    title="What-If Analysis",
-    icon=":material/tune:",
+hadoop_analytics = st.Page(
+    "pages/8_Hadoop_Team_Analytics.py",
+    title="Hadoop Team Analytics",
+    icon=":material/bar_chart:",
 )
 
 
@@ -64,7 +64,7 @@ pg = st.navigation(
         "Machine Learning": [
             prediction,
             model,
-            what_if,
+            hadoop_analytics,
         ],
     }
 )
